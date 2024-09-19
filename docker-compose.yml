@@ -1,0 +1,9 @@
+# docker-compose.yml
+version: '3'
+services:
+  image_service:
+    build: ./image-service
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./output:/app/output  # Make sure this is correctly set
