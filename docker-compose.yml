@@ -7,3 +7,27 @@ services:
       - "5000:5000"
     volumes:
       - ./output:/app/output  # Make sure this is correctly set
+      
+  db_service:
+    build: ./db-service
+    depends_on:
+      - image_service
+      - db
+    volumes:
+      - ./output:/app/output  # To access generated images
+    ports:
+      - "5001:5001"
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: images_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
