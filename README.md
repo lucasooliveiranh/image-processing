@@ -1,6 +1,6 @@
 ## Image Processing Application
 
 ### How to run?
-
-- docker-compose build
-- docker compose up
+ 
+1. docker-compose build <br>
+2. docker compose up
