@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route('/generate', methods=['POST'])
 def generate():
     data = request.json
-    text = data.get('text', 'Hello World')
+    text = data.get('text', 'Hello World123')
     image_path = generate_image(text)
     
     return jsonify({"image_path": image_path})
