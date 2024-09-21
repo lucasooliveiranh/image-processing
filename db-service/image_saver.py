@@ -34,3 +34,25 @@ def save_image_to_db(image_path):
     conn.close()
 
     return f"Image {image_name} saved successfully!"
+
+# Function to get all images from the database
+def get_all_images_from_db():
+    # Example using SQLite, adjust according to your DB setup
+    conn = psycopg2.connect(
+        dbname="images_db",
+        user="user",
+        password="password",
+        host="db",
+        port="5432"
+    )
+    cursor = conn.cursor()
+
+    # Query to fetch all images (adjust table and columns as needed)
+    cursor.execute("SELECT * FROM images")
+    rows = cursor.fetchall()
+
+    # Close the connection
+    conn.close()
+
+    # Assuming images table has columns (id, image_path), returning image paths
+    return [row[1] for row in rows]
