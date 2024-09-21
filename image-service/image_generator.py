@@ -1,7 +1,8 @@
 import os
+import uuid
 from PIL import Image, ImageDraw
 
-def generate_image(text):
+def generate_image(text, index):
     output_dir = "/app/output"
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)  # Create the directory if it doesn't exist
@@ -10,7 +11,8 @@ def generate_image(text):
     d = ImageDraw.Draw(img)
     d.text((10, 40), text, fill=(255, 255, 0))
 
-    image_path = os.path.join(output_dir, "generated_image.png")
+    # Save image with a unique file name, using the index to differentiate each image
+    image_path = os.path.join(output_dir, f"generated_image_{index}.png")
     img.save(image_path)
-
+    
     return image_path
