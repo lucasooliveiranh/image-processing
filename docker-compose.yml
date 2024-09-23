@@ -12,7 +12,7 @@ services:
       - RABBITMQ_PORT=5672
     volumes:
       - ./output:/app/output  # Make sure this is correctly set
-  
+
   ui_service:
     build: ./ui-service
     ports:
@@ -31,7 +31,7 @@ services:
       - RABBITMQ_PORT=5672
     volumes:
       - ./output:/app/output  # To access generated images
-  
+
   db:
     image: postgres:13
     environment:
@@ -58,5 +58,6 @@ services:
     ports:
       - "5672:5672"  # RabbitMQ default port for communication
       - "15672:15672"  # RabbitMQ Management UI (Optional, but useful for debugging)
+
 volumes:
   db_data:

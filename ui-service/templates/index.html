@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Generator</title>
     <script>
-        async function generateImages() {
+        async function generateImages(type) {
             const text = document.getElementById('text').value;
             const numImages = document.getElementById('numImages').value;
 
             const response = await fetch('http://localhost:5000/generate', {  // Use the absolute URL here
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, numImages })
+                body: JSON.stringify({ text, numImages, type }) // Send the selected type
             });
 
             const data = await response.json();
@@ -22,14 +22,19 @@
 </head>
 <body>
     <h1>Generate Images</h1>
-    <form id="imageForm" onsubmit="event.preventDefault(); generateImages();">
+    <form id="imageForm" onsubmit="event.preventDefault();">
         <label for="text">Image Text:</label>
         <input type="text" id="text" name="text" required><br><br>
 
         <label for="numImages">Number of Images:</label>
         <input type="number" id="numImages" name="numImages" min="1" value="1" required><br><br>
 
-        <button type="submit">Generate</button>
+        <button type="button" onclick="generateImages('high_resolution')">High Resolution</button>
+        <button type="button" onclick="generateImages('complex_patterns')">Complex Patterns</button>
+        <button type="button" onclick="generateImages('generative_art')">Generative Art</button>
+        <button type="button" onclick="generateImages('image_filters')">Apply Filters</button>
+        <button type="button" onclick="generateImages('additional_elements')">Additional Elements</button>
+        <button type="button" onclick="generateImages('batch_processing')">Batch Processing</button>
     </form>
     
     <div id="result"></div>
