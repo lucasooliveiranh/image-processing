@@ -4,3 +4,4 @@ Pillow==8.2.0
 flask-cors
 pika
 numpy
+requests

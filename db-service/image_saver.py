@@ -2,57 +2,54 @@ import psycopg2
 import os
 
 def save_image_to_db(image_path):
-    
-    # Connect to the PostgreSQL database
-    conn = psycopg2.connect(
-        dbname="images_db",
-        user="user",
-        password="password",
-        host="db",
-        port="5432"
-    )
-    cursor = conn.cursor()
+    try:
+        conn = psycopg2.connect(
+            dbname=os.environ.get('POSTGRES_DB', 'images_db'),
+            user=os.environ.get('POSTGRES_USER', 'user'),
+            password=os.environ.get('POSTGRES_PASSWORD', 'password'),
+            host='db',
+            port='5432'
+        )
+        cursor = conn.cursor()
+        
+        with open(image_path, 'rb') as file:
+            image_data = file.read()
 
-    # Read the image file
-    with open(image_path, 'rb') as file:
-        image_data = file.read()
+        image_name = os.path.basename(image_path)
 
-    # Get image name from the path
-    image_name = os.path.basename(image_path)
+        cursor.execute("""
+            INSERT INTO images (image_name, image_path, image_data) 
+            VALUES (%s, %s, %s)
+        """, (image_name, image_path, image_data))
 
-    # Insert image data into the database
-    cursor.execute("""
-        INSERT INTO images (image_name, image_path, image_data) 
-        VALUES (%s, %s, %s)
-    """, (image_name, image_path, image_data))
+        conn.commit()
 
-    # Commit the transaction
-    conn.commit()
+        return f"Image {image_name} saved successfully!"
+    except Exception as e:
+        print(f"Error saving image to DB: {e}")
+        raise
+    finally:
+        cursor.close()
+        conn.close()
 
-    # Close the connection
-    cursor.close()
-    conn.close()
-
-    return f"Image {image_name} saved successfully!"
-
-# Function to get all images from the database
 def get_all_images_from_db():
-    # Example using SQLite, adjust according to your DB setup
-    conn = psycopg2.connect(
-        dbname="images_db",
-        user="user",
-        password="password",
-        host="db",
-        port="5432"
-    )
-    cursor = conn.cursor()
+    try:
+        conn = psycopg2.connect(
+            dbname=os.environ.get('POSTGRES_DB', 'images_db'),
+            user=os.environ.get('POSTGRES_USER', 'user'),
+            password=os.environ.get('POSTGRES_PASSWORD', 'password'),
+            host='db',
+            port='5432'
+        )
+        cursor = conn.cursor()
 
-    # Query to fetch all images (adjust table and columns as needed)
-    cursor.execute("SELECT * FROM images")
-    rows = cursor.fetchall()
+        cursor.execute("SELECT * FROM images")
+        rows = cursor.fetchall()
 
-    # Close the connection
-    conn.close()
-
-    # Assuming images table has columns (id, image_path), returning image paths
-    return [row[1] for row in rows]
+        return [row[1] for row in rows]  # Assuming the second column is image_path
+    except Exception as e:
+        print(f"Error fetching images from DB: {e}")
+        raise
+    finally:
+        cursor.close()
+        conn.close()
