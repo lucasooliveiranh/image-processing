@@ -6,13 +6,14 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - rabbitmq
+      - db_service
     environment:
-      - RABBITMQ_HOST=rabbitmq  # Hostname to connect to RabbitMQ
-      - RABBITMQ_PORT=5672
+      - DB_SERVICE_URL=http://db_service:5001  # URL to the db_service
     volumes:
       - ./output:/app/output  # Make sure this is correctly set
-  
+    networks:
+      - my_network
+
   ui_service:
     build: ./ui-service
     ports:
@@ -24,14 +25,13 @@ services:
     build: ./db-service
     ports:
       - "5001:5001"
-    depends_on:
-      - rabbitmq
-    environment:
-      - RABBITMQ_HOST=rabbitmq  # Hostname to connect to RabbitMQ
-      - RABBITMQ_PORT=5672
+    depends_on: 
+      - db
     volumes:
       - ./output:/app/output  # To access generated images
-  
+    networks:
+      - my_network
+
   db:
     image: postgres:13
     environment:
@@ -43,20 +43,9 @@ services:
     volumes:
       - ./db-init:/docker-entrypoint-initdb.d
 
-#  pgadmin:
-#    image: dpage/pgadmin4
-#    environment:
-#      PGADMIN_DEFAULT_EMAIL: admin@example.com  # Admin email for login
-#      PGADMIN_DEFAULT_PASSWORD: admin           # Admin password for login
-#    ports:
-#      - "5050:80"  # Exposes pgAdmin on http://localhost:5050
-#    depends_on:
-#      - db    
+networks:
+  my_network:
+    driver: bridge  # You can specify the network driver here if needed
 
-  rabbitmq:
-    image: "rabbitmq:3-management"
-    ports:
-      - "5672:5672"  # RabbitMQ default port for communication
-      - "15672:15672"  # RabbitMQ Management UI (Optional, but useful for debugging)
 volumes:
   db_data:
