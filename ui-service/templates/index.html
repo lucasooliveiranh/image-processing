@@ -9,14 +9,22 @@
             const text = document.getElementById('text').value;
             const numImages = document.getElementById('numImages').value;
 
-            const response = await fetch('http://localhost:5000/generate', {  // Use the absolute URL here
+            // Envia os dados para o endpoint /send do servidor (back-end)
+            const response = await fetch('http://localhost:5005/send', {  // Use a URL para o endpoint /send
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, numImages, type }) // Send the selected type
+                body: JSON.stringify({ 
+                    input: { 
+                        text, 
+                        numImages, 
+                        type 
+                    } 
+                }) // Envie o input do usuário no formato esperado
             });
 
+            // Verifique a resposta do servidor
             const data = await response.json();
-            document.getElementById('result').innerHTML = `Generated image paths: ${data.image_paths}`;
+            document.getElementById('result').innerHTML = `Mensagem enviada: ${JSON.stringify(data)}`;
         }
     </script>
 </head>

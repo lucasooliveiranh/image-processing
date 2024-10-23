@@ -1,51 +1,25 @@
 # docker-compose.yml
 version: '3'
 services:
-  image_service:
-    build: ./image-service
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
     ports:
-      - "5000:5000"
-    depends_on:
-      - db_service
-    environment:
-      - DB_SERVICE_URL=http://db_service:5001  # URL to the db_service
-    volumes:
-      - ./output:/app/output  # Make sure this is correctly set
+      - "5672:5672"  # Porta para os clientes se conectarem
+      - "15672:15672"  # Porta da interface de administração
     networks:
-      - my_network
+      - rabbitmq_network
 
   ui_service:
     build: ./ui-service
     ports:
       - "5005:5005"
-    depends_on:
-      - image_service
-
-  db_service:
-    build: ./db-service
-    ports:
-      - "5001:5001"
-    depends_on: 
-      - db
-    volumes:
-      - ./output:/app/output  # To access generated images
     networks:
-      - my_network
-
-  db:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: images_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./db-init:/docker-entrypoint-initdb.d
+      - rabbitmq_network
 
 networks:
-  my_network:
-    driver: bridge  # You can specify the network driver here if needed
+  rabbitmq_network:
+    driver: bridge
 
 volumes:
   db_data:
