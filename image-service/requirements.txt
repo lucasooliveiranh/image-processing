@@ -5,3 +5,5 @@ flask-cors
 pika
 numpy
 requests
+prometheus-client
+psutil

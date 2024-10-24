@@ -1,5 +1,4 @@
 # docker-compose.yml
-version: '3'
 services:
   rabbitmq:
     image: rabbitmq:3-management
@@ -16,6 +15,24 @@ services:
       - "5005:5005"
     networks:
       - rabbitmq_network
+
+  image_service:
+    build: ./image-service
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./output:/app/output  # Make sure this is correctly set
+    networks:
+      - rabbitmq_network
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"  # Porta para acessar a interface do Prometheus
+    networks:
+      - rabbitmq_network  # Conecta o Prometheus à mesma rede dos outros serviços
 
 networks:
   rabbitmq_network:

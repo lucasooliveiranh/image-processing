@@ -2,3 +2,5 @@ Flask[async]
 aiohttp
 requests
 pika
+prometheus-client
+psutil

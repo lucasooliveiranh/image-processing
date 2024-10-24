@@ -1,10 +1,30 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
+from prometheus_client import generate_latest, CollectorRegistry, Gauge, CONTENT_TYPE_LATEST
 import pika
 import json
+import psutil  # Para obter métricas reais de CPU e memória
 
 app = Flask(__name__)
 
-# Função para enviar mensagem à fila
+# Registro de métricas personalizado para evitar conflitos
+registry = CollectorRegistry()
+cpu_usage = Gauge('cpu_usage', 'CPU Usage (%)', registry=registry)
+memory_usage = Gauge('memory_usage', 'Memory Usage (%)', registry=registry)
+
+def collect_metrics():
+    cpu_percent = psutil.cpu_percent(interval=1)  # Coleta o uso de CPU
+    memory_percent = psutil.virtual_memory().percent  # Coleta o uso de memória
+
+    cpu_usage.set(cpu_percent)  # Define o valor real do uso de CPU
+    memory_usage.set(memory_percent)  # Define o valor real do uso de memória
+
+# Endpoint para expor as métricas
+@app.route('/metrics')
+def metrics():
+    collect_metrics()  # Atualiza as métricas antes de retorná-las
+    return Response(generate_latest(registry), mimetype=CONTENT_TYPE_LATEST)
+
+# Função para enviar mensagem à fila RabbitMQ
 def send_to_queue(message):
     try:
         connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))  # Conecte-se ao container RabbitMQ
@@ -41,4 +61,5 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
+    # Inicia o Flask na porta 5005
     app.run(debug=True, host='0.0.0.0', port=5005)
